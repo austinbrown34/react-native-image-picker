@@ -239,12 +239,17 @@ RCT_EXPORT_METHOD(showImagePicker:(NSDictionary *)options callback:(RCTResponseS
         NSString *mediaType = [info objectForKey:UIImagePickerControllerMediaType];
         
         NSString *fileName;
+        NSString *imageFileType;
+        if ([self.options valueForKey:@"imageFileType"]) {
+            imageFileType = [self.options valueForKey:@"imageFileType"];
+        }
+        
         if ([mediaType isEqualToString:(NSString *)kUTTypeImage]) {
             NSString *tempFileName = [[NSUUID UUID] UUIDString];
             if (imageURL && [[imageURL absoluteString] rangeOfString:@"ext=GIF"].location != NSNotFound) {
                 fileName = [tempFileName stringByAppendingString:@".gif"];
             }
-            else if ([[[self.options objectForKey:@"imageFileType"] stringValue] isEqualToString:@"png"] || [[[self.options objectForKey:@"imageFileType"] stringValue] isEqualToString:@"PNG"] || [[imageURL absoluteString] rangeOfString:@"ext=PNG"].location != NSNotFound || [[imageURL absoluteString] rangeOfString:@"ext=png"].location != NSNotFound) {
+            else if ([imageFileType  isEqual: @"png"] || [[imageURL absoluteString] rangeOfString:@"ext=PNG"].location != NSNotFound || [[imageURL absoluteString] rangeOfString:@"ext=png"].location != NSNotFound) {
                 fileName = [tempFileName stringByAppendingString:@".png"];
             }
             else {
@@ -361,7 +366,11 @@ RCT_EXPORT_METHOD(showImagePicker:(NSDictionary *)options callback:(RCTResponseS
             image = [self downscaleImageIfNecessary:image maxWidth:maxWidth maxHeight:maxHeight];
             
             NSData *data;
-            if ([[self.options objectForKey:@"imageFileType"] isEqualToString:@"png"]){
+            NSString *imageFileType;
+            if ([self.options valueForKey:@"imageFileType"]) {
+                imageFileType = [self.options valueForKey:@"imageFileType"];
+            }
+            if ([imageFileType  isEqual: @"png"]){
                 data = UIImagePNGRepresentation(image);
             }
             else {
